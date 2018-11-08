@@ -1,0 +1,82 @@
+#!/bin/sh
+
+echo "---------------------------------------------"
+echo " read Location ID and configure ip address"
+echo "---------------------------------------------"
+
+VERSION=1.2.2
+echo "The current version is $VERSION"
+
+echo 504 > /sys/class/gpio/export
+echo 505 > /sys/class/gpio/export
+echo 506 > /sys/class/gpio/export
+echo 507 > /sys/class/gpio/export
+echo 508 > /sys/class/gpio/export
+echo 509 > /sys/class/gpio/export
+echo 510 > /sys/class/gpio/export
+echo 511 > /sys/class/gpio/export
+
+timeout_cnt=0
+timeout=60
+
+while true; do
+	b0=`cat /sys/class/gpio/gpio504/value`
+	b1=`cat /sys/class/gpio/gpio505/value`
+	b2=`cat /sys/class/gpio/gpio506/value`
+	b3=`cat /sys/class/gpio/gpio507/value`
+	b4=`cat /sys/class/gpio/gpio508/value`
+	b5=`cat /sys/class/gpio/gpio509/value`
+	b6=`cat /sys/class/gpio/gpio510/value`
+	b7=`cat /sys/class/gpio/gpio511/value`
+
+	loc_id=${b7}${b6}${b5}${b4}${b3}${b2}${b1}${b0}
+	echo "LOC_ID=$loc_id"
+	
+	if [ "$loc_id" = "11111111" ]; then
+		echo "location id is not ready yet. Wait for 2 more seconds......"
+		sleep 2s
+	elif [ "$loc_id" = "00000001" ]; then
+		echo "Location ID=$loc_id, ip address will be set to 192.168.254.251"
+		break
+	elif [ "$loc_id" = "00000011" ]; then
+		echo "Location ID=$loc_id, ip address will be set to 192.168.254.252"
+		break
+	fi
+
+	timeout_cnt=$[$timeout_cnt+1]
+	if [ $timeout_cnt -eq $timeout ]; then
+		echo "Time out! Location ID=$loc_id is illegal! "
+		exit 1		
+	fi
+done
+
+timeout_cnt=0
+timeout=60
+NETREADY=0
+while [ $NETREADY -ne 1 ]; do
+	ifconfig | grep -q eth0 && echo "network is ready!" && NETREADY=1 || echo "network is not ready!"
+	sleep 3s
+	
+	timeout_cnt=$[$timeout_cnt+1]
+        if [ $timeout_cnt -eq $timeout ]; then
+                echo "Time out! Network is not ready! "
+                exit 1
+        fi
+done
+
+#while true; do
+	if [ "$loc_id" = "00000001" ]; then
+		ifconfig eth0 192.168.254.251
+		ifconfig eth0 down
+		ifconfig eth0 hw ether 00:0A:35:00:22:51
+		ifconfig eth0 up
+		echo "Location ID=$loc_id. Ethernet setting:ip address=192.168.254.251; MAC=00:0A:35:00:22:51"
+	elif [ "$loc_id" = "00000011" ]; then
+		ifconfig eth0 192.168.254.252
+		ifconfig eth0 down
+		ifconfig eth0 hw ether 00:0A:35:00:22:52
+		ifconfig eth0 up
+		echo "Location ID=$loc_id. Ethernet setting: ip address=192.168.254.252; MAC=00:0A:35:00:22:52"
+	fi
+#done
+

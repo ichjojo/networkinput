@@ -1,0 +1,33 @@
+#!/bin/sh
+
+#echo "-----------------------------------"
+echo " start App Initialization......"
+VERSION=1.3.1
+echo "The current version is $VERSION"
+#echo "-----------------------------------"
+
+#TARGET_IP=192.168.254.5
+#echo "---  Waiting for network $TARGET_IP  ---"
+
+#NETREADY=0
+#while [ $NETREADY -ne 1 ];
+#do
+#ping $TARGET_IP -c 2 | grep -q ttl= && echo "network is ready!" && NETREADY=1 || echo "network is not ready!"
+#sleep 10s
+#done
+
+DAEMON=/usr/bin/led-heartbeat
+echo " Starting led-heartbeat "
+start-stop-daemon -S -o --background -x $DAEMON
+
+echo " to configure ip......"
+/usr/bin/read-loc-id > /home/root/log_read_loc_id &
+
+echo " to set up TCP server for firmware update......"
+/usr/bin/firmware-update &
+
+#DAEMON=/usr/bin/read-loc-id
+#echo " Start ip configuration"
+#echo " This is still in app-init-or-start "
+#start-stop-daemon -S -o --background  -x $DAEMON
+

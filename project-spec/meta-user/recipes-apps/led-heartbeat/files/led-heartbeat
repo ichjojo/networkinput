@@ -1,0 +1,42 @@
+#!/bin/sh
+
+echo "** Heartbeat Starts **"
+echo "** this is still in led-heartbeat **"
+
+VERSION=1.2.1
+echo "The current version is $VERSION"
+
+echo 360 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio360/direction
+
+echo 361 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio361/direction
+
+timeout_cnt=1
+timeout=10
+while [ 1 ] ; do
+	echo 1 > /sys/class/gpio/gpio360/value
+	echo 1 > /sys/class/gpio/gpio361/value
+	sleep 30s
+	
+	echo 0 > /sys/class/gpio/gpio360/value
+	echo 0 > /sys/class/gpio/gpio361/value
+	sleep 30s
+	
+	#To restart /usr/bin/firmware-update if it's terminated
+	ps_status=`ps | grep firmware-update | grep -v grep || echo "restart"`
+	echo $ps_status >> /home/root/log_ps_status
+
+	if [ "$ps_status" = "restart" ]; then
+		/usr/bin/firmware-update&
+		
+	fi
+
+	timeout_cnt=$[$timeout_cnt+1]
+        if [ $timeout_cnt -eq $timeout ]; then
+                echo "The log records only 10 lines message" > /home/root/log_ps_status
+		timeout_cnt=1
+        fi
+
+done
+

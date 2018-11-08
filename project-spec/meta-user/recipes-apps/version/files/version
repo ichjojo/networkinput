@@ -1,0 +1,70 @@
+#!/bin/sh
+
+echo "La Trappe network-input board"
+VERSION=01.11.01
+echo "The current version is $VERSION"
+
+echo "changes: ip address to 192.168.254.251"
+echo "changes: 20180713: add axi_lite_gpio for location ID"
+
+echo "changes on 1.2.0: add scripts to read location ID and configure IP"
+
+echo "changes on 1.3.0:"
+echo "                  add json-rpc update support"
+
+echo "changes on 1.3.1:"
+echo "                  add support to change MAC address dynamically"
+
+echo "changes on 1.5.1:"
+echo "                  integrate FPGA bit 1.5.0"
+echo "                  read version from /usr/bin/version"
+
+echo "changes on 1.5.2:"
+echo "                  support JSON string V4"
+
+echo "changes on 1.5.3:"
+echo "                  support JSON string V6 with firmware-updated V1.3.9"
+
+echo "changes on 1.5.4:"
+echo "                  add support of TCPDump"
+echo "                  integrate firmware-update V1.5.1"
+
+echo "changes on 1.5.5:"
+echo "                  Requested by XiaoKe to support a special format of firmware.version"
+echo "			which is supported by firmware-update v1.5.2"
+
+echo "changes on 1.5.6:"
+echo "                  Support JSON format V7 with firmware-update v1.5.4"
+
+echo "changes on 1.8.0:"
+echo "                  integrate FPGA bit V1.8.0"
+
+echo "changes on 1.8.1:"
+echo "                  support JSON format V8"
+
+echo "changes on 1.9.0:"
+echo "                  Upgrade fpga-delivery-package to 1.9.0 to support JSON format V8"
+
+echo "changes on 1.9.1:"
+echo "                  to enable fsck for FAT and Linux"
+
+echo "changes on 1.9.2:"
+echo "                  change the partition of rootfs from /dev/mmcblk0p5 to /dev/mmcblk0p2"
+
+echo "changes on 1.9.3:"
+echo "                  This version is only to generate a different version than 1.9.2 upgrading test"
+
+echo "changes on 1.9.4:"
+echo "                  Go back to use the old partitions /dev/mmcblk0p5. Keep this during Beta"
+
+echo "changes on 1.9.5:"
+echo "                  generate a different version only for upgrading test"
+
+echo "changes on 1.10.0:"
+echo "                  To integrate FPGA bit V1.10.0 which has fixed the artifacts issue in case of 4K"
+
+echo "changes on 1.11.0:"
+echo "                  change the partitions of rootfs from /dev/mmcblk0p5 to /dev/mmcblk0p2"
+echo "                  add a file version into cornetnetwork.bin. ONLY the version to be updated is newer than 1.11.0 is allowed to update"
+echo "                  add a file kernel-update-enable to indicate if you need to update image.ub or not"
+

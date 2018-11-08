@@ -1,0 +1,14 @@
+/include/ "system-conf.dtsi"
+/ {
+};
+
+&gem1 {
+	status = "okay";
+	phy-mode = "rgmii-id";
+	phy-handle = <&phy0>;
+
+	phy0: phy@4 {
+		reg = <4>;
+		device_type = "ethernet-phy";
+	};
+};

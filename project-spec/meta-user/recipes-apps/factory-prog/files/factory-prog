@@ -1,0 +1,82 @@
+#!/bin/sh
+
+echo " *** Start initial programming *****"
+
+VERSION=1.2.0
+echo "The current version is $VERSION"
+
+echo ""
+echo "*********************************************"
+echo " Delete all old partitions"
+echo "*********************************************"
+echo ""
+echo "d
+1
+d
+2
+w 
+" | fdisk /dev/mmcblk0
+
+echo ""
+echo "*********************************************"
+echo " make file systems"
+echo "*********************************************"
+echo ""
+echo "n
+p
+1
+
++512M
+t
+b
+n
+e
+2
+
+
+n
+l
+5
+
+
+w
+" | fdisk /dev/mmcblk0 && mkdosfs /dev/mmcblk0p1 && mkfs -F /dev/mmcblk0p5
+mkdir /mnt/mmcblk0p1
+mkdir /mnt/mmcblk0p5
+umount /dev/mmcblk0p1
+umount /dev/mmcblk0p5
+mount /dev/mmcblk0p1 /mnt/mmcblk0p1
+mount /dev/mmcblk0p5 /mnt/mmcblk0p5
+
+echo ""
+echo "*********************************************"
+echo " start programming uboot and kernel"
+echo "*********************************************"
+echo ""
+cd /mnt/mmcblk0p1
+tftp -g -r BOOT.BIN 192.168.254.5
+tftp -g -r BOOT0002.BIN 192.168.254.5
+tftp -g -r BOOT0003.BIN 192.168.254.5
+tftp -g -r image.ub.golden 192.168.254.5
+sync
+mv image.ub.golden image.ub
+sync
+
+echo ""
+echo "*********************************************"
+echo " start programming rootfs"
+echo "*********************************************"
+echo ""
+cd /mnt/mmcblk0p5
+tftp -g -r rootfs.cpio 192.168.254.5
+cpio -idmv < rootfs.cpio
+sync
+
+echo ""
+echo "*********************************************"
+echo " The programming finished!"
+echo " Please power off the board. "
+echo " remove the jumper J32 and power on again!"
+echo "*********************************************"
+echo ""
+

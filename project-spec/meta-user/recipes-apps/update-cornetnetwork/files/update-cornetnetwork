@@ -1,0 +1,99 @@
+#!/bin/sh
+
+echo "To update firmware......"
+
+VERSION=1.4.2
+echo "The current version is $VERSION"
+
+cd /home/root
+echo "remove old files......"
+rm -f BOOT0002.BIN image.ub rootfs.cpio kernel-update-enable version
+
+echo "extracting the bin file......"
+filename=cornetnetwork.bin
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 2
+fi
+tar -tvf cornetnetwork.bin
+tar -xzvf cornetnetwork.bin
+
+echo "checking the existence of the necessary package files "
+filename=version
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 6
+fi
+
+filename=kernel-update-enable
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 7
+fi
+
+
+echo "copying......"
+filename=BOOT0002.BIN
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 3
+fi
+filename=image.ub
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 4
+fi
+filename=rootfs.cpio
+if [ -e $filename ]; then 
+	echo "$filename does exist!"
+else
+	echo "$filename not exist yet!"
+	exit 5
+fi
+
+cp BOOT0002.BIN /run/media/mmcblk0p1
+
+echo "checking the flag of kernel-update-enable"
+cat kernel-update-enable | grep kernel_update_enable=1
+if [ $? -eq 0 ]; then
+	echo "The flag is 1. The kernel image will be updated!"
+	cp image.ub /run/media/mmcblk0p1
+else
+	echo "The falg is 0. The kernel image will not be updated!"
+fi
+sync
+
+cd /run/media/mmcblk0p2
+if [ $? -eq 0 ]; then
+	echo "/run/media/mmcblkp2 does exist! It's RAM-booting mode now!"
+	cp rootfs.cpio  /run/media/mmcblk0p2
+else
+	echo "/run/media/mmcblkp2 does not exist! It's SDCard-booting mode now! Go to root!"
+	cp rootfs.cpio /
+	cd /
+fi
+sync
+
+echo "extracting rootfs......"
+cpio -idumv < rootfs.cpio
+sync
+
+cd /home/root
+echo "remove cornetnetwork.bin......"
+rm -f cornetnetwork.bin
+sync
+
+echo "finished!"
+exit 1
+
+

@@ -1,0 +1,51 @@
+#!/bin/sh
+
+echo "To check if the FTP file is ready......"
+
+VERSION=1.2.0
+echo "The current version is $VERSION"
+
+timeout_cnt=1
+timeout=3
+filename=/home/root/cornetnetwork.bin
+
+while true; do
+	
+	if [ -e $filename ]; then 
+	
+		echo "$filename does exist!"
+		break
+	else
+		echo "$filename not exist yet!"
+		#sleep 2s
+	fi		
+		
+	timeout_cnt=$[$timeout_cnt+1]
+	if [ $timeout_cnt -eq $timeout ]; then
+		echo "Time out! $filename does NOT exist yet!"
+		exit 5		
+	fi
+done
+
+timeout_cnt=1
+timeout=2
+while true; do
+	file_status_1=`ls -lh $filename`
+	echo "$file_status_1"
+	usleep 100000
+	file_status_2=`ls -alh $filename`
+	echo "$file_status_2"        
+
+	if [ "$file_status_1" = "$file_status_2" ]; then
+
+                echo "The FTP transfering for $filename has been finisehd!"
+                exit 1
+	fi
+
+        timeout_cnt=$[$timeout_cnt+1]
+        if [ $timeout_cnt -eq $timeout ]; then
+                echo "Time out! File transfer failed!"
+                exit 6
+        fi
+done
+

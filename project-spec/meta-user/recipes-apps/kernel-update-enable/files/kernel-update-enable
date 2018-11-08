@@ -1,0 +1,4 @@
+#!/bin/sh
+
+kernel_update_enable=1
+echo "kernel_update_enable is: $kernel_update_enable"
